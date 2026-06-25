@@ -1,6 +1,6 @@
 {
   "name": "anima",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Anima — a desktop control panel for AI personalities in Claude Code.",
   "author": "Anima",
   "main": "electron/main.cjs",
