@@ -1,0 +1,16 @@
+node_modules/
+dist/
+dist-electron/
+release/
+journal-*.md
+*.log
+.DS_Store
+
+# Secrets / personal data — never commit
+*.env
+.env*
+*.keystore
+*.jks
+anima-data.json
+settings.json.anima-backup-*
+docs/
