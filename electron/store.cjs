@@ -36,11 +36,32 @@ function filePath() {
   return path.join(app.getPath('userData'), 'anima-data.json')
 }
 
+// One-time content migrations for already-saved data. The seed in defaults()
+// only runs on first launch, so superseded built-in persona text is corrected
+// here on load. Only an EXACT match of the old text is replaced — a card the
+// user edited themselves is never touched.
+const OLD_ROCKY = 'Talk like a tough but caring boxing coach. Short, punchy sentences. Push me hard, celebrate small wins, and never let me make excuses.'
+function migrate(parsed) {
+  let changed = false
+  for (const card of parsed.cards) {
+    if (card.id === 'rocky' && card.talk === OLD_ROCKY) {
+      card.talk = ROCKY
+      card.desc = 'Rocky, the Eridian from Project Hail Mary. Small words, big brain.'
+      if (card.glyph === '🥊') card.glyph = '🦀'
+      changed = true
+    }
+  }
+  return changed
+}
+
 function load() {
   try {
     const raw = fs.readFileSync(filePath(), 'utf8')
     const parsed = JSON.parse(raw)
-    if (parsed && parsed.cards && parsed.state) return parsed
+    if (parsed && parsed.cards && parsed.state) {
+      if (migrate(parsed)) save(parsed)
+      return parsed
+    }
   } catch (e) { /* first run / corrupt -> defaults */ }
   const d = defaults()
   save(d)

@@ -7,6 +7,7 @@ const store = require('./store.cjs')
 const voice = require('./voice.cjs')
 const claude = require('./claude.cjs')
 const voiceServer = require('./voiceServer.cjs')
+const { autoUpdater } = require('electron-updater')
 
 function ensureVoiceServer() {
   voiceServer.start(claude.PORT, (b64) => { if (win && !win.isDestroyed()) win.webContents.send('anima:play', b64) })
@@ -179,6 +180,11 @@ app.whenReady().then(() => {
   createTray()
   // If already connected to Claude, bring the voice server up so the Stop hook can speak.
   try { if (claude.status().connected) ensureVoiceServer() } catch (e) {}
+  // Auto-update: in packaged builds, check GitHub Releases, download in the
+  // background, and install on next quit. Silent no-op in dev / on error.
+  if (app.isPackaged) {
+    try { autoUpdater.checkForUpdatesAndNotify() } catch (e) {}
+  }
   app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) createWindow() })
 })
 
